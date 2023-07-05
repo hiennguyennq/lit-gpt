@@ -42,7 +42,9 @@ def prepare(
     with open(checkpoint_dir / "lit_config.json", "r") as file:
         config = json.load(file)
         max_seq_length = config["block_size"]
-
+    for item in data:
+        item["input"] = item.pop("context")
+        item["output"] = item.pop("response")
     destination_path.mkdir(parents=True, exist_ok=True)
     data_file_path = destination_path / data_file_name
     print("Loading data file...")
