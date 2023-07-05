@@ -32,6 +32,7 @@ def prepare(
     seed: int = 42,
     mask_inputs: bool = False,  # as in alpaca-lora
     data_file_name: str = DATA_FILE_NAME,
+    data_file_url: str = DATA_FILE_URL
 ) -> None:
     """Prepare the Dolly dataset for instruction tuning.
 
@@ -40,7 +41,7 @@ def prepare(
     """
     destination_path.mkdir(parents=True, exist_ok=True)
     file_path = destination_path / data_file_name
-    download_if_missing(file_path)
+    download_if_missing(file_path, data_file_url)
 
     tokenizer = Tokenizer(checkpoint_dir / "tokenizer.json", checkpoint_dir / "tokenizer_config.json")
 
