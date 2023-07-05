@@ -43,7 +43,7 @@ def prepare(
     file_path = destination_path / data_file_name
     download_if_missing(file_path, data_file_url)
 
-    tokenizer = Tokenizer(checkpoint_dir / "tokenizer.json", checkpoint_dir / "tokenizer_config.json")
+    tokenizer = Tokenizer(checkpoint_dir)
 
     with open(file_path, "r") as file:
         data = file.readlines()
