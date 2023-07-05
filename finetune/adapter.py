@@ -21,9 +21,9 @@ from lit_gpt.utils import lazy_load, check_valid_checkpoint_dir, step_csv_logger
 from lit_gpt.speed_monitor import SpeedMonitor, measure_flops, estimate_flops
 from scripts.prepare_alpaca import generate_prompt
 
-eval_interval = 600
-save_interval = 1000
-eval_iters = 100
+eval_interval = 100
+save_interval = 200
+eval_iters = 50
 log_interval = 1
 devices = 1
 # change this value to force a maximum sequence length
@@ -35,7 +35,7 @@ batch_size = 64 / devices
 micro_batch_size = 4
 gradient_accumulation_iters = batch_size // micro_batch_size
 assert gradient_accumulation_iters > 0
-epoch_size = 50000  # train dataset size
+epoch_size = 15000  # train dataset size
 num_epochs = 1
 max_iters = num_epochs * (epoch_size // micro_batch_size) // devices
 weight_decay = 0.02
