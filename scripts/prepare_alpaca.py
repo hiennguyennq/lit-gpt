@@ -14,8 +14,8 @@ sys.path.append(str(wd))
 
 from lit_gpt.tokenizer import Tokenizer
 
-DATA_FILE_URL = "https://raw.githubusercontent.com/tloen/alpaca-lora/main/alpaca_data_cleaned_archive.json"
-DATA_FILE_NAME = "alpaca_data_cleaned_archive.json"
+DATA_FILE = "https://huggingface.co/datasets/databricks/databricks-dolly-15k/resolve/main/databricks-dolly-15k.jsonl"
+DATA_FILE_NAME = "dolly_data_cleaned_archive.json"
 DESTINATION_PATH = Path("data/alpaca")
 CHECKPOINT_DIR = Path("checkpoints/stabilityai/stablelm-base-alpha-3b")
 TEST_SPLIT_SIZE = 2000
@@ -25,35 +25,31 @@ SEED = 42
 
 
 def prepare(
-    destination_path: Path = DESTINATION_PATH,
-    checkpoint_dir: Path = CHECKPOINT_DIR,
-    test_split_size: int = TEST_SPLIT_SIZE,
-    seed: int = SEED,
-    mask_inputs: bool = MASK_INPUTS,
+    destination_path: Path = Path("data/dolly"),
+    checkpoint_dir: Path = Path("checkpoints/togethercomputer/RedPajama-INCITE-Base-3B-v1"),
+    test_split_size: int = 2000,
+    max_seq_length: int = 256,
+    seed: int = 42,
+    mask_inputs: bool = False,  # as in alpaca-lora
     data_file_name: str = DATA_FILE_NAME,
-    data_file_url: str = DATA_FILE_URL,
-    ignore_index: int = IGNORE_INDEX,
 ) -> None:
-    """Prepare the Alpaca dataset for instruction tuning.
+    """Prepare the Dolly dataset for instruction tuning.
 
-    The output is a training and test dataset saved as `train.pt` and `test.pt`,
+    The output is a training and validation dataset saved as `train.pt` and `val.pt`,
     which stores the preprocessed and tokenized prompts and labels.
     """
-    with open(checkpoint_dir / "lit_config.json", "r") as file:
-        config = json.load(file)
-        max_seq_length = config["block_size"]
+    destination_path.mkdir(parents=True, exist_ok=True)
+    file_path = destination_path / data_file_name
+    download(file_path)
+
+    tokenizer = Tokenizer(checkpoint_dir / "tokenizer.json", checkpoint_dir / "tokenizer_config.json")
+
+    with open(file_path, "r") as file:
+        data = file.readlines()
+        data = [json.loads(line) for line in data]
     for item in data:
         item["input"] = item.pop("context")
         item["output"] = item.pop("response")
-    destination_path.mkdir(parents=True, exist_ok=True)
-    data_file_path = destination_path / data_file_name
-    print("Loading data file...")
-    download_if_missing(data_file_path, data_file_url)
-    with open(data_file_path, "r", encoding="utf-8") as file:
-        data = json.load(file)
-
-    print("Loading tokenizer...")
-    tokenizer = Tokenizer(checkpoint_dir)
 
     # Partition the dataset into train and test
     train_split_size = len(data) - test_split_size
@@ -63,33 +59,15 @@ def prepare(
     train_set, test_set = list(train_set), list(test_set)
 
     print(f"train has {len(train_set):,} samples")
-    print(f"test has {len(test_set):,} samples")
+    print(f"val has {len(test_set):,} samples")
 
     print("Processing train split ...")
-    train_set = [
-        prepare_sample(
-            example=sample,
-            tokenizer=tokenizer,
-            max_length=max_seq_length,
-            mask_inputs=mask_inputs,
-            ignore_index=ignore_index,
-        )
-        for sample in tqdm(train_set)
-    ]
-    torch.save(train_set, destination_path / "train.pt")
+    train_set = [prepare_sample(sample, tokenizer, max_seq_length, mask_inputs) for sample in tqdm(train_set)]
+    torch.save(train_set, file_path.parent / "train.pt")
 
     print("Processing test split ...")
-    test_set = [
-        prepare_sample(
-            example=sample,
-            tokenizer=tokenizer,
-            max_length=max_seq_length,
-            mask_inputs=mask_inputs,
-            ignore_index=ignore_index,
-        )
-        for sample in tqdm(test_set)
-    ]
-    torch.save(test_set, destination_path / "test.pt")
+    test_set = [prepare_sample(sample, tokenizer, max_seq_length, mask_inputs) for sample in tqdm(test_set)]
+    torch.save(test_set, file_path.parent / "test.pt")
 
 
 def download_if_missing(file_path: Path, file_url: str):
