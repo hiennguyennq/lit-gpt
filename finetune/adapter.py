@@ -22,7 +22,7 @@ from lit_gpt.speed_monitor import SpeedMonitor, measure_flops, estimate_flops
 from scripts.prepare_alpaca import generate_prompt
 
 eval_interval = 100
-save_interval = 200
+save_interval = 450
 eval_iters = 50
 log_interval = 1
 devices = 1
