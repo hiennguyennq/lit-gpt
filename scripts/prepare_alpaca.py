@@ -46,8 +46,7 @@ def prepare(
     tokenizer = Tokenizer(checkpoint_dir)
 
     with open(file_path, "r") as file:
-        data = file.readlines()
-        data = [json.loads(line) for line in data]
+        data = json.load(file)
     for item in data:
         item["input"] = item.pop("context")
         item["output"] = item.pop("response")
