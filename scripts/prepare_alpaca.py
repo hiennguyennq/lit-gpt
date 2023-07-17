@@ -14,11 +14,11 @@ sys.path.append(str(wd))
 
 from lit_gpt.tokenizer import Tokenizer
 
-DATA_FILE_URL = "https://huggingface.co/datasets/databricks/databricks-dolly-15k/resolve/main/databricks-dolly-15k.jsonl"
+DATA_FILE_URL = "https://drive.google.com/u/0/uc?id=1rBmCqXmlPCeObEhZMA8cxGTgU2Jvifv3&export=download"
 DATA_FILE_NAME = "dolly_data_cleaned_archive.json"
 DESTINATION_PATH = Path("data/alpaca")
 CHECKPOINT_DIR = Path("checkpoints/stabilityai/stablelm-base-alpha-3b")
-TEST_SPLIT_SIZE = 2000
+TEST_SPLIT_SIZE = 1000
 IGNORE_INDEX = -1
 MASK_INPUTS = False  # as in alpaca-lora
 SEED = 42
@@ -27,8 +27,8 @@ SEED = 42
 def prepare(
     destination_path: Path = Path("data/dolly"),
     checkpoint_dir: Path = Path("checkpoints/togethercomputer/RedPajama-INCITE-Base-3B-v1"),
-    test_split_size: int = 2000,
-    max_seq_length: int = 256,
+    test_split_size: int = 1000,
+    max_seq_length: int = 64,
     seed: int = 42,
     mask_inputs: bool = False,  # as in alpaca-lora
     data_file_name: str = DATA_FILE_NAME,
