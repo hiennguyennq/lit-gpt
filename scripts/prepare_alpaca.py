@@ -14,7 +14,7 @@ sys.path.append(str(wd))
 
 from lit_gpt.tokenizer import Tokenizer
 
-DATA_FILE_URL = "https://drive.google.com/u/0/uc?id=1Z8u0Eb5-YwejL9gtFoCnsFPYie-DtMEk&export=download"
+DATA_FILE_URL = "https://drive.google.com/u/0/uc?id=10wz0Al1Va6CCygCZF9BkpN58uZbEDm0m&export=download"
 DATA_FILE_NAME = "dolly_data_cleaned_archive.json"
 DESTINATION_PATH = Path("data/alpaca")
 CHECKPOINT_DIR = Path("checkpoints/stabilityai/stablelm-base-alpha-3b")
